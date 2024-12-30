@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, text_node_to_html_node
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
@@ -11,13 +11,13 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(node, node2)
     
     def test_eq2(self):
-        node = TextNode("This is another text node", TextType.IMAGES, "www.boot.dev")
-        node2 = TextNode("This is another text node", TextType.IMAGES, "www.boot.dev")
+        node = TextNode("This is another text node", TextType.IMAGE, "www.boot.dev")
+        node2 = TextNode("This is another text node", TextType.IMAGE, "www.boot.dev")
         self.assertEqual(node, node2)
 
     def test_not_eq(self):
-        node = TextNode("This is another text node", TextType.IMAGES, "www.boot.dev")
-        node2 = TextNode("This is not another text node", TextType.IMAGES, "www.boot.dev")
+        node = TextNode("This is another text node", TextType.IMAGE, "www.boot.dev")
+        node2 = TextNode("This is not another text node", TextType.IMAGE, "www.boot.dev")
         self.assertNotEqual(node, node2)
 
 class TestHTMLNode(unittest.TestCase):
@@ -130,6 +130,43 @@ class TestParentNode(unittest.TestCase):
         expected_case = """<main><nav><a>Link</a></nav><div><p>Para</p></div></main>"""
         self.assertEqual(test_case, expected_case)
     
+class TestTextToHTML(unittest.TestCase):
+    def test_case_text(self):
+        text_node = TextNode("Hello", TextType.TEXT)
+        html_node = text_node_to_html_node(text_node)
+        expected_case = HTMLNode(None, "Hello", None, {})
+        self.assertEqual(html_node, expected_case)
+    
+    def test_case_bold(self):
+        text_node = TextNode("Hello", TextType.BOLD)
+        html_node = text_node_to_html_node(text_node)
+        expected_case = HTMLNode("b", "Hello", None, {})
+        self.assertEqual(html_node, expected_case)
+    
+    def test_case_italic(self):
+        text_node = TextNode("Hello", TextType.ITALIC)
+        html_node = text_node_to_html_node(text_node)
+        expected = HTMLNode("i", "Hello", None, {})
+        self.assertEqual(html_node, expected)
+    
+    def test_case_code(self):
+        text_node = TextNode("print('hello')", TextType.CODE)
+        html_node = text_node_to_html_node(text_node)
+        expected = HTMLNode("code", "print('hello')", None, {})
+        self.assertEqual(html_node, expected)
+    
+    def test_case_link(self):
+        text_node = TextNode("click me", TextType.LINK, "https://boot.dev")
+        html_node = text_node_to_html_node(text_node)
+        expected = HTMLNode("a", "click me", None, {"href": "https://boot.dev"})
+        self.assertEqual(html_node, expected)
+    
+    def test_case_image(self):
+        text_node = TextNode("alt text here", TextType.IMAGE, "https://boot.dev")
+        html_node = text_node_to_html_node(text_node)
+        expected = HTMLNode("img", "", None, {"src": "https://boot.dev", "alt": "alt text here"})
+        self.assertEqual(html_node, expected)
+
 
 
 if __name__ == "__main__":
