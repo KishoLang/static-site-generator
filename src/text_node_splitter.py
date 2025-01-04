@@ -2,6 +2,12 @@ from textnode import TextType, TextNode
 from htmlnode import HTMLNode
 from extract_markdown_links import extract_markdown_links, extract_markdown_images
 
+def text_to_textnodes(text):
+    text_node = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(split_nodes_delimiter(split_nodes_delimiter(text_node, "**", TextType.BOLD), "*", TextType.ITALIC), "`", TextType.CODE) 
+    return split_nodes_link(split_nodes_image(nodes))
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for node in old_nodes:
@@ -22,7 +28,7 @@ def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
-        if node.text_type == TextType.IMAGE:
+        if node.text_type != TextType.TEXT:
             new_nodes.append(node)
         else:
             extracted_images = extract_markdown_images(current_text)
@@ -40,7 +46,7 @@ def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
         current_text = node.text
-        if node.text_type == TextType.LINK:
+        if node.text_type != TextType.TEXT:
             new_nodes.append(node)
         else:
             extracted_links = extract_markdown_links(current_text)
