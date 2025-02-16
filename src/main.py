@@ -1,21 +1,26 @@
-from textnode import TextNode, TextType, text_node_to_html_node
-from extract_markdown_links import extract_markdown_images, extract_markdown_links
-from text_node_splitter import split_nodes_image, split_nodes_link, split_nodes_delimiter, text_to_textnodes
-from handle_blocks import markdown_to_blocks
+import os
+import shutil
+
+from copystatic import copy_files_recursive
+from generatecontent import generate_pages_recursive
+
+
+dir_path_static = "./static"
+dir_path_public = "./public"
+dir_path_content = "./content"
+template_path = "./template.html"
+
 
 def main():
-    # text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    # nodes = text_to_textnodes(text)
-    # print(nodes)
-    # This is a heading
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
 
-    # markdown_string = "This is a paragraph with **bold** and *italic* text.\n\n* A list item\n\n* Another list item"
-    markdown_string = "# This is a heading\n\nThis is a paragraph with **bold** text.\n\n* First list item\n\n\n* Second list item\n"
-    print(markdown_to_blocks(markdown_string))
+    print("Copying static files to public directory...")
+    copy_files_recursive(dir_path_static, dir_path_public)
 
-
-    
+    print("Generating content...")
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
 
 
-if __name__ == "__main__":
-    main()
+main()
